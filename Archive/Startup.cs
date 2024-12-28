@@ -1,15 +1,15 @@
+using Archive.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MongoConsumerLibary.MongoConnection;
+using MongoConsumerLibary.MongoConnection.Collections;
+using MongoConsumerLibary.MongoConnection.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Archive
 {
@@ -22,7 +22,6 @@ namespace Archive
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
@@ -31,9 +30,9 @@ namespace Archive
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Archive", Version = "v1" });
             });
+            StartSingleTones(services);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -51,6 +50,13 @@ namespace Archive
             {
                 endpoints.MapControllers();
             });
+        }
+        public void StartSingleTones(IServiceCollection services)
+        {
+            MongoSettings mongoSettings = Configuration.GetSection(nameof(MongoSettings)).Get<MongoSettings>();
+            MongoConnection mongoConnection = new MongoConnection(mongoSettings);
+            services.AddSingleton(mongoConnection);
+            services.AddSingleton<IFrameService, FrameService>();
         }
     }
 }
