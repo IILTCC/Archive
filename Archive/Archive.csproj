@@ -9,9 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Enums\" />
-    <Folder Include="Dtos\" />
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\..\MongoConsumer\MongoConsumerLibary\MongoConsumerLibary.csproj" />
   </ItemGroup>
 
 </Project>
