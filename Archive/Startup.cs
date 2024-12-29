@@ -55,6 +55,7 @@ namespace Archive
         {
             MongoSettings mongoSettings = Configuration.GetSection(nameof(MongoSettings)).Get<MongoSettings>();
             MongoConnection mongoConnection = new MongoConnection(mongoSettings);
+            services.AddSingleton(new ZlibCompression());
             services.AddSingleton(mongoConnection);
             services.AddSingleton<IFrameService, FrameService>();
         }

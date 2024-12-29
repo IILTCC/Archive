@@ -18,12 +18,12 @@ namespace Archive.Controllers
             _frameService = frameService;
         }
        [HttpPost("getFrames")]
-        public Task<List<BaseBoxCollection>> GetFrames([FromBody] GetFramesDto getFramesDto)
+        public Task<List<RetFrameDto>> GetFrames([FromBody] GetFramesDto getFramesDto)
         {
             return _frameService.GetFrames(getFramesDto);
         }
         [HttpPost("getIcdFrames")]
-        public Task<List<BaseBoxCollection>> GetIcdFrames([FromBody] GetIcdFramesDto getIcdFramesDto)
+        public Task<List<RetFrameDto>> GetIcdFrames([FromBody] GetIcdFramesDto getIcdFramesDto)
         {
             return _frameService.GetIcdFrames(getIcdFramesDto);
         }
