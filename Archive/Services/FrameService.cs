@@ -19,7 +19,7 @@ namespace Archive.Services
             _zlibCompression = zlibCompression;
         }
 
-        public async Task<List<RetFrameDto>> GetFrames(GetFramesDto getFramesDto)
+        public async Task<Dictionary<string, List<ParamValueDict>>> GetFrames(GetFramesDto getFramesDto)
         {
             getFramesDto.StartDate = ConvertToUtc(getFramesDto.StartDate);
             getFramesDto.EndDate = ConvertToUtc(getFramesDto.EndDate);
@@ -28,7 +28,7 @@ namespace Archive.Services
             return ConvertToRetDto(getFramesDto.StartDate, getFramesDto.EndDate, baseBoxList);
         }
 
-        public async Task<List<RetFrameDto>> GetIcdFrames(GetIcdFramesDto getIcdFramesDto)
+        public async Task<Dictionary<string, List<ParamValueDict>>> GetIcdFrames(GetIcdFramesDto getIcdFramesDto)
         {
             getIcdFramesDto.StartDate = ConvertToUtc(getIcdFramesDto.StartDate);
             getIcdFramesDto.EndDate = ConvertToUtc(getIcdFramesDto.EndDate);
@@ -40,28 +40,28 @@ namespace Archive.Services
         {
             return DateTime.SpecifyKind(dateTime,DateTimeKind.Utc);
         }
-        private List<RetFrameDto> ConvertToRetDto(DateTime startDate,DateTime endDate, List<BaseBoxCollection> baseBoxList)
+        private Dictionary<string,List<ParamValueDict>> ConvertToRetDto(DateTime startDate,DateTime endDate, List<BaseBoxCollection> baseBoxList)
         {
-            List<RetFrameDto> retList = new List<RetFrameDto>();
-            foreach (var frame in baseBoxList)
+            Dictionary<string, List<ParamValueDict>> retDictionary = new Dictionary<string, List<ParamValueDict>>();
+
+            foreach (BaseBoxCollection frame in baseBoxList)
             {
                 Dictionary<string, (int value, bool wasProblemFound)> decryptedDictionary = null;
                 string decompressedData = _zlibCompression.DecompressData(frame.CompressedData);
                 try
                 {
                     decryptedDictionary = JsonConvert.DeserializeObject<Dictionary<string, (int, bool)>>(decompressedData);
-                }catch(Exception e)
-                {
-                }
+                }catch(Exception e) {}
 
-                Dictionary<string, ParamValueDict> retDictionay = new Dictionary<string, ParamValueDict>();
                 foreach (string key in decryptedDictionary.Keys)
-                    retDictionay[key] = new ParamValueDict(decryptedDictionary[key].value, decryptedDictionary[key].wasProblemFound);
-
-                RetFrameDto retFrameDto = new RetFrameDto(frame.IcdType,frame.InsertTime,frame.ExpirationTime,retDictionay);
-                retList.Add(retFrameDto);
+                {
+                    if (!retDictionary.ContainsKey(key))
+                        retDictionary.Add(key,new List<ParamValueDict>());
+                    
+                    retDictionary[key].Add(new ParamValueDict(decryptedDictionary[key].value, decryptedDictionary[key].wasProblemFound,frame.InsertTime));
+                }
             }
-            return retList;
+            return retDictionary;
         }
     }
 }
