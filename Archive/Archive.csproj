@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DownSampling\DownSamplingLibary\DownSamplingLibary.csproj" />
     <ProjectReference Include="..\..\MongoConsumer\MongoConsumerLibary\MongoConsumerLibary.csproj" />
   </ItemGroup>
 

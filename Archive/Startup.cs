@@ -58,6 +58,7 @@ namespace Archive
             services.AddSingleton(new ZlibCompression());
             services.AddSingleton(mongoConnection);
             services.AddSingleton<IFrameService, FrameService>();
+            services.AddSingleton(new PointReducer());
         }
     }
 }
