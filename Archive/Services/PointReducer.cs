@@ -9,18 +9,20 @@ namespace Archive.Services
     {
         public PointReducer() { }
 
+        // fucntion to remove more points the bigger the input points non lineary
         private double ReduceFunction(int pointCount)
         {
-            const int asymptota= 98;
-            const int slope = 20000;
-            const double horizontalMovement = 141.4213563;
-            return asymptota * (slope/Math.Pow(pointCount + horizontalMovement,2));
+            return Consts.ASYMPTOTA * (Consts.SLOPE/Math.Pow(pointCount + Consts.HORIZONTAL_MOVEMENT,2));
         }
+        // x value is n point milisecond subtracted by first point miliseconds
         private List<PointHelper> ConvertToHelper(List<ParamValueDict> paramList)
         {
             List<PointHelper> retList = new List<PointHelper>();
             foreach(ParamValueDict point in paramList)
-                retList.Add(new PointHelper(point.InsertTime.Subtract(paramList[0].InsertTime).TotalMilliseconds, point.Value, point.IsFaulty));
+            {
+                double timeValue = point.InsertTime.Subtract(paramList[Consts.FIRST_POINT_REDUCER].InsertTime).TotalMilliseconds;
+                retList.Add(new PointHelper(timeValue, point.Value, point.IsFaulty));
+            }
             return retList;
         }
         private List<ParamValueDict> ConvertToParam(List<PointHelper> pointsList,DateTime startPoint)
@@ -37,7 +39,7 @@ namespace Archive.Services
             Dictionary<string, List<ParamValueDict>> retDict = new Dictionary<string, List<ParamValueDict>>();
             foreach(string dictKey in paramsDict.Keys)
             {
-                int desiredPoints = (int)(paramsDict[dictKey].Count * ReduceFunction(paramsDict[dictKey].Count) / 100);
+                int desiredPoints = (int)(paramsDict[dictKey].Count * ReduceFunction(paramsDict[dictKey].Count) /Consts.PRECENT );
                 List<PointHelper> reducedList =  largestTriangle.ReducePoints(ConvertToHelper(paramsDict[dictKey]), desiredPoints);
                 retDict.Add(dictKey, ConvertToParam(reducedList, paramsDict[dictKey][0].InsertTime));
             }

@@ -5,6 +5,7 @@ using MongoConsumerLibary.MongoConnection.Collections;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Archive.Services
@@ -63,9 +64,7 @@ namespace Archive.Services
                     retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.InsertTime));
                 }
             }
-
             return _pointReducer.ReducePoints(retDictionary);
         }
-
     }
 }
