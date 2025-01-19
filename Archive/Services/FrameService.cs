@@ -25,7 +25,7 @@ namespace Archive.Services
             getFramesDto.EndDate = ConvertToUtc(getFramesDto.EndDate);
             List<BaseBoxCollection> baseBoxList =  await _mongoConnection.GetDocument(getFramesDto.FrameCount, getFramesDto.StartPoint, getFramesDto.StartDate, getFramesDto.EndDate);
 
-            return ConvertToRetDto(getFramesDto.StartDate, getFramesDto.EndDate, baseBoxList);
+            return MapFramesToDictionary(getFramesDto.StartDate, getFramesDto.EndDate, baseBoxList);
         }
 
         public async Task<Dictionary<string, List<ParamValueDict>>> GetIcdFrames(GetIcdFramesDto getIcdFramesDto)
@@ -34,31 +34,31 @@ namespace Archive.Services
             getIcdFramesDto.EndDate = ConvertToUtc(getIcdFramesDto.EndDate);
 
             List<BaseBoxCollection> baseBoxList = await _mongoConnection.GetDocument(getIcdFramesDto.CollectionType,getIcdFramesDto.FrameCount, getIcdFramesDto.StartPoint, getIcdFramesDto.StartDate, getIcdFramesDto.EndDate);
-            return ConvertToRetDto(getIcdFramesDto.StartDate,getIcdFramesDto.EndDate,baseBoxList);
+            return MapFramesToDictionary(getIcdFramesDto.StartDate,getIcdFramesDto.EndDate,baseBoxList);
         }
         private DateTime ConvertToUtc(DateTime dateTime)
         {
             return DateTime.SpecifyKind(dateTime,DateTimeKind.Utc);
         }
-        private Dictionary<string,List<ParamValueDict>> ConvertToRetDto(DateTime startDate,DateTime endDate, List<BaseBoxCollection> baseBoxList)
+        private Dictionary<string,List<ParamValueDict>> MapFramesToDictionary(DateTime startDate,DateTime endDate, List<BaseBoxCollection> baseBoxList)
         {
             Dictionary<string, List<ParamValueDict>> retDictionary = new Dictionary<string, List<ParamValueDict>>();
 
             foreach (BaseBoxCollection frame in baseBoxList)
             {
-                Dictionary<string, (int value, bool wasProblemFound)> decryptedDictionary = null;
+                Dictionary<string, (int value, bool wasProblemFound)> decodeDictionary = null;
                 string decompressedData = _zlibCompression.DecompressData(frame.CompressedData);
                 try
                 {
-                    decryptedDictionary = JsonConvert.DeserializeObject<Dictionary<string, (int, bool)>>(decompressedData);
+                    decodeDictionary = JsonConvert.DeserializeObject<Dictionary<string, (int, bool)>>(decompressedData);
                 }catch(Exception e) {}
 
-                foreach (string key in decryptedDictionary.Keys)
+                foreach (string key in decodeDictionary.Keys)
                 {
                     if (!retDictionary.ContainsKey(key))
                         retDictionary.Add(key,new List<ParamValueDict>());
                     
-                    retDictionary[key].Add(new ParamValueDict(decryptedDictionary[key].value, decryptedDictionary[key].wasProblemFound,frame.InsertTime));
+                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.InsertTime));
                 }
             }
             return retDictionary;

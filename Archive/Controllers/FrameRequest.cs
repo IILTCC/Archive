@@ -22,7 +22,7 @@ namespace Archive.Controllers
         {
             return _frameService.GetFrames(getFramesDto);
         }
-        [HttpPost("getIcdFrames")]
+        [HttpPost("frameByIcd")]
         public Task<Dictionary<string, List<ParamValueDict>>> GetIcdFrames([FromBody] GetIcdFramesDto getIcdFramesDto)
         {
             return _frameService.GetIcdFrames(getIcdFramesDto);
