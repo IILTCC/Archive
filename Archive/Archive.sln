@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archive", "Archive.csproj", "{7A4B51D7-E58C-4220-9BAE-273BD871C347}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiveMongo", "..\ArchiveMongo\ArchiveMongo.csproj", "{1382C655-69BD-474D-98ED-791689F09698}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MongoConsumerLibary", "..\..\MongoConsumer\MongoConsumerLibary\MongoConsumerLibary.csproj", "{81720781-D4B6-4195-B99C-44EFD5F0F423}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{7A4B51D7-E58C-4220-9BAE-273BD871C347}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A4B51D7-E58C-4220-9BAE-273BD871C347}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A4B51D7-E58C-4220-9BAE-273BD871C347}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1382C655-69BD-474D-98ED-791689F09698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1382C655-69BD-474D-98ED-791689F09698}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1382C655-69BD-474D-98ED-791689F09698}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1382C655-69BD-474D-98ED-791689F09698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81720781-D4B6-4195-B99C-44EFD5F0F423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81720781-D4B6-4195-B99C-44EFD5F0F423}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81720781-D4B6-4195-B99C-44EFD5F0F423}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81720781-D4B6-4195-B99C-44EFD5F0F423}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
