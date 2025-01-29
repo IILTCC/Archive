@@ -1,11 +1,11 @@
 ﻿using Archive.Dtos;
 using Archive.Dtos.Incoming;
+using Archive.Logs;
 using MongoConsumerLibary.MongoConnection;
 using MongoConsumerLibary.MongoConnection.Collections;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Archive.Services
@@ -15,11 +15,13 @@ namespace Archive.Services
         private readonly MongoConnection _mongoConnection;
         private readonly ZlibCompression _zlibCompression;
         private readonly PointReducer _pointReducer;
-        public FrameService(MongoConnection mongoConnection, ZlibCompression zlibCompression,PointReducer pointReducer)
+        private readonly ArchiveLogger _logger;
+        public FrameService(MongoConnection mongoConnection, ZlibCompression zlibCompression,PointReducer pointReducer,ArchiveLogger logger)
         {
             _mongoConnection = mongoConnection;
             _zlibCompression = zlibCompression;
             _pointReducer = pointReducer;
+            _logger = logger;
         }
 
         public async Task<Dictionary<string, List<ParamValueDict>>> GetFrames(GetFramesDto getFramesDto)
@@ -54,7 +56,10 @@ namespace Archive.Services
                 try
                 {
                     decodeDictionary = JsonConvert.DeserializeObject<Dictionary<string, (int, bool)>>(decompressedData);
-                }catch(Exception e) {}
+                }catch(Exception e) 
+                {
+                    _logger.LogError("Tried converting json to packet "+e.Message,LogId.FatalJsonConvert);
+                }
 
                 foreach (string key in decodeDictionary.Keys)
                 {
@@ -66,5 +71,6 @@ namespace Archive.Services
             }
             return _pointReducer.ReducePoints(retDictionary);
         }
+
     }
 }

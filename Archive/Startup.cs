@@ -1,4 +1,6 @@
+using Archive.Logs;
 using Archive.Services;
+using HealthCheck;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +12,7 @@ using MongoConsumerLibary.MongoConnection.Collections;
 using MongoConsumerLibary.MongoConnection.Enums;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Archive
 {
@@ -54,11 +57,21 @@ namespace Archive
         public void StartSingleTones(IServiceCollection services)
         {
             MongoSettings mongoSettings = Configuration.GetSection(nameof(MongoSettings)).Get<MongoSettings>();
-            MongoConnection mongoConnection = new MongoConnection(mongoSettings);
+            HealthCheckSettings healthCheckSettings = Configuration.GetSection(nameof(HealthCheckSettings)).Get<HealthCheckSettings>();
+            services.AddSingleton(mongoSettings);
+            services.AddSingleton(new ArchiveLogger());
+            services.AddSingleton<MongoConnection>();
             services.AddSingleton(new ZlibCompression());
-            services.AddSingleton(mongoConnection);
             services.AddSingleton<IFrameService, FrameService>();
             services.AddSingleton(new PointReducer());
+            HealthCheckEndPoint healthCheck = new HealthCheckEndPoint();
+            Task.Run(() => { healthCheck.StartUp(healthCheckSettings); });
+            // force start mongoconnection on start
+            using (IServiceScope scope = services.BuildServiceProvider().CreateScope()) 
+            {
+                ArchiveLogger logger = scope.ServiceProvider.GetRequiredService<ArchiveLogger>();
+                MongoConnection mongoConnection = scope.ServiceProvider.GetRequiredService<MongoConnection>();
+            }
         }
     }
 }
