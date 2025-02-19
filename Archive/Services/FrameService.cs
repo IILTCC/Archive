@@ -5,6 +5,7 @@ using MongoConsumerLibary.MongoConnection.Collections;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Archive.Services
@@ -13,10 +14,12 @@ namespace Archive.Services
     {
         private readonly MongoConnection _mongoConnection;
         private readonly ZlibCompression _zlibCompression;
-        public FrameService(MongoConnection mongoConnection, ZlibCompression zlibCompression)
+        private readonly PointReducer _pointReducer;
+        public FrameService(MongoConnection mongoConnection, ZlibCompression zlibCompression,PointReducer pointReducer)
         {
             _mongoConnection = mongoConnection;
             _zlibCompression = zlibCompression;
+            _pointReducer = pointReducer;
         }
 
         public async Task<Dictionary<string, List<ParamValueDict>>> GetFrames(GetFramesDto getFramesDto)
@@ -61,7 +64,7 @@ namespace Archive.Services
                     retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.InsertTime));
                 }
             }
-            return retDictionary;
+            return _pointReducer.ReducePoints(retDictionary);
         }
     }
 }
