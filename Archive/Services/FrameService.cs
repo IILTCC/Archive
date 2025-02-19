@@ -1,4 +1,4 @@
-using Archive.Dtos;
+﻿using Archive.Dtos;
 using Archive.Dtos.Incoming;
 using Archive.Logs;
 using MongoConsumerLibary.MongoConnection;
@@ -37,7 +37,6 @@ namespace Archive.Services
         {
             getIcdFramesDto.StartDate = ConvertToUtc(getIcdFramesDto.StartDate);
             getIcdFramesDto.EndDate = ConvertToUtc(getIcdFramesDto.EndDate);
-
             List<BaseBoxCollection> baseBoxList = await _mongoConnection.GetDocument(getIcdFramesDto.CollectionType,getIcdFramesDto.FrameCount, getIcdFramesDto.StartPoint, getIcdFramesDto.StartDate, getIcdFramesDto.EndDate);
             return MapFramesToDictionary(getIcdFramesDto.StartDate,getIcdFramesDto.EndDate,baseBoxList);
         }
