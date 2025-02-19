@@ -33,6 +33,18 @@ namespace Archive
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Archive", Version = "v1" });
             });
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200")
+                               .AllowAnyHeader()
+                               .AllowCredentials()
+
+                               .AllowAnyMethod();
+                    });
+            });
             StartSingleTones(services);
         }
 
@@ -46,7 +58,7 @@ namespace Archive
             }
 
             app.UseRouting();
-
+            app.UseCors();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
