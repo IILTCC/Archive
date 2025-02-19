@@ -27,5 +27,10 @@ namespace Archive.Controllers
         {
             return _frameService.GetIcdFrames(getIcdFramesDto);
         }
+        [HttpPost("getFrameCount")]
+        public Task<long> GetFrameCount([FromBody] GetFrameCount getFrameCount)
+        {
+            return _frameService.GetFrameCount(getFrameCount);
+        }
     }
 }

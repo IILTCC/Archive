@@ -1,4 +1,4 @@
-﻿using Archive.Dtos;
+using Archive.Dtos;
 using Archive.Dtos.Incoming;
 using Archive.Logs;
 using MongoConsumerLibary.MongoConnection;
@@ -66,11 +66,17 @@ namespace Archive.Services
                     if (!retDictionary.ContainsKey(key))
                         retDictionary.Add(key,new List<ParamValueDict>());
                     
-                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.InsertTime));
+                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.PacketTime));
                 }
             }
+
             return _pointReducer.ReducePoints(retDictionary);
         }
-
+        public async Task<long> GetFrameCount(GetFrameCount getFrameCount)
+        {
+            getFrameCount.StartDate = ConvertToUtc(getFrameCount.StartDate);
+            getFrameCount.EndDate = ConvertToUtc(getFrameCount.EndDate);
+            return await _mongoConnection.GetDocumentCount(getFrameCount.StartDate, getFrameCount.EndDate, getFrameCount.CollectionType);
+        }
     }
 }

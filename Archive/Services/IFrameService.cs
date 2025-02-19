@@ -9,5 +9,7 @@ namespace Archive.Services
     {
         public Task<Dictionary<string, List<ParamValueDict>>> GetFrames(GetFramesDto getFramesDto);
         public Task<Dictionary<string, List<ParamValueDict>>> GetIcdFrames(GetIcdFramesDto getFramesDto);
+        public Task<long> GetFrameCount(GetFrameCount getFrameCount);
+
     }
 }
