@@ -65,7 +65,7 @@ namespace Archive.Services
                     if (!retDictionary.ContainsKey(key))
                         retDictionary.Add(key,new List<ParamValueDict>());
                     
-                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.PacketTime));
+                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.RealTime));
                 }
             }
 
