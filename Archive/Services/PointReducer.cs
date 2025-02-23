@@ -12,7 +12,7 @@ namespace Archive.Services
         // fucntion to remove more points the bigger the input points non lineary
         private double ReduceFunction(int pointCount)
         {
-            return Consts.ASYMPTOTA * (Consts.SLOPE/Math.Pow(pointCount + Consts.HORIZONTAL_MOVEMENT,2));
+            return (Consts.UPPER_ASYMPTOTA_LIMIT / (1 + Consts.SLOPE / pointCount));
         }
         // x value is n point milisecond subtracted by first point miliseconds
         private List<PointHelper> ConvertToHelper(List<ParamValueDict> paramList)
@@ -20,7 +20,7 @@ namespace Archive.Services
             List<PointHelper> retList = new List<PointHelper>();
             foreach(ParamValueDict point in paramList)
             {
-                double timeValue = point.InsertTime.Subtract(paramList[Consts.FIRST_POINT_REDUCER].InsertTime).TotalMilliseconds;
+                double timeValue = point.PacketTime.Subtract(paramList[Consts.FIRST_POINT_REDUCER].PacketTime).TotalMilliseconds;
                 retList.Add(new PointHelper(timeValue, point.Value, point.IsFaulty));
             }
             return retList;
@@ -39,9 +39,9 @@ namespace Archive.Services
             Dictionary<string, List<ParamValueDict>> retDict = new Dictionary<string, List<ParamValueDict>>();
             foreach(string dictKey in paramsDict.Keys)
             {
-                int desiredPoints = (int)(paramsDict[dictKey].Count * ReduceFunction(paramsDict[dictKey].Count) /Consts.PRECENT );
+                int desiredPoints = (int)(paramsDict[dictKey].Count * (Consts.PRECENT- ReduceFunction(paramsDict[dictKey].Count)) /Consts.PRECENT );
                 List<PointHelper> reducedList =  largestTriangle.ReducePoints(ConvertToHelper(paramsDict[dictKey]), desiredPoints);
-                retDict.Add(dictKey, ConvertToParam(reducedList, paramsDict[dictKey][0].InsertTime));
+                retDict.Add(dictKey, ConvertToParam(reducedList, paramsDict[dictKey][0].PacketTime));
             }
             return retDict;
         }

@@ -1,11 +1,11 @@
 ﻿using Archive.Dtos;
 using Archive.Dtos.Incoming;
+using Archive.Logs;
 using MongoConsumerLibary.MongoConnection;
 using MongoConsumerLibary.MongoConnection.Collections;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Archive.Services
@@ -15,11 +15,13 @@ namespace Archive.Services
         private readonly MongoConnection _mongoConnection;
         private readonly ZlibCompression _zlibCompression;
         private readonly PointReducer _pointReducer;
-        public FrameService(MongoConnection mongoConnection, ZlibCompression zlibCompression,PointReducer pointReducer)
+        private readonly ArchiveLogger _logger;
+        public FrameService(MongoConnection mongoConnection, ZlibCompression zlibCompression,PointReducer pointReducer,ArchiveLogger logger)
         {
             _mongoConnection = mongoConnection;
             _zlibCompression = zlibCompression;
             _pointReducer = pointReducer;
+            _logger = logger;
         }
 
         public async Task<Dictionary<string, List<ParamValueDict>>> GetFrames(GetFramesDto getFramesDto)
@@ -35,7 +37,6 @@ namespace Archive.Services
         {
             getIcdFramesDto.StartDate = ConvertToUtc(getIcdFramesDto.StartDate);
             getIcdFramesDto.EndDate = ConvertToUtc(getIcdFramesDto.EndDate);
-
             List<BaseBoxCollection> baseBoxList = await _mongoConnection.GetDocument(getIcdFramesDto.CollectionType,getIcdFramesDto.FrameCount, getIcdFramesDto.StartPoint, getIcdFramesDto.StartDate, getIcdFramesDto.EndDate);
             return MapFramesToDictionary(getIcdFramesDto.StartDate,getIcdFramesDto.EndDate,baseBoxList);
         }
@@ -54,17 +55,27 @@ namespace Archive.Services
                 try
                 {
                     decodeDictionary = JsonConvert.DeserializeObject<Dictionary<string, (int, bool)>>(decompressedData);
-                }catch(Exception e) {}
+                }catch(Exception e) 
+                {
+                    _logger.LogError("Tried converting json to packet "+e.Message,LogId.FatalJsonConvert);
+                }
 
                 foreach (string key in decodeDictionary.Keys)
                 {
                     if (!retDictionary.ContainsKey(key))
                         retDictionary.Add(key,new List<ParamValueDict>());
                     
-                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.InsertTime));
+                    retDictionary[key].Add(new ParamValueDict(decodeDictionary[key].value, decodeDictionary[key].wasProblemFound,frame.PacketTime));
                 }
             }
+
             return _pointReducer.ReducePoints(retDictionary);
+        }
+        public async Task<long> GetFrameCount(GetFrameCount getFrameCount)
+        {
+            getFrameCount.StartDate = ConvertToUtc(getFrameCount.StartDate);
+            getFrameCount.EndDate = ConvertToUtc(getFrameCount.EndDate);
+            return await _mongoConnection.GetDocumentCount(getFrameCount.StartDate, getFrameCount.EndDate, getFrameCount.CollectionType);
         }
     }
 }
