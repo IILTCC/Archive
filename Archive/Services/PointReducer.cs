@@ -1,4 +1,5 @@
 ﻿using Archive.Dtos;
+using DownSamplingLibary;
 using DownSamplingLibary.LargestTriangle;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,17 @@ namespace Archive.Services
                 int desiredPoints = (int)(paramsDict[dictKey].Count * (Consts.PRECENT- ReduceFunction(paramsDict[dictKey].Count)) /Consts.PRECENT );
                 List<PointHelper> reducedList =  largestTriangle.ReducePoints(ConvertToHelper(paramsDict[dictKey]), desiredPoints);
                 retDict.Add(dictKey, ConvertToParam(reducedList, paramsDict[dictKey][0].PacketTime));
+            }
+            return retDict;
+        }
+        public Dictionary<string, List<GraphPoint>> ReducePoint(Dictionary<string,List<GraphPoint>> statisticsDict)
+        {
+            LargestTriangle<GraphPoint> largestTriangle = new LargestTriangle<GraphPoint>();
+            Dictionary<string, List<GraphPoint>> retDict = new Dictionary<string, List<GraphPoint>>();
+            foreach(string dictKey in statisticsDict.Keys)
+            {
+                int desiredPoints = (int)(statisticsDict[dictKey].Count * (Consts.PRECENT - ReduceFunction(statisticsDict[dictKey].Count)) / Consts.PRECENT);
+                retDict.Add(dictKey, largestTriangle.ReducePoints(statisticsDict[dictKey],desiredPoints));
             }
             return retDict;
         }

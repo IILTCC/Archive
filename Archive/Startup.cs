@@ -76,6 +76,7 @@ namespace Archive
             services.AddSingleton(new ZlibCompression());
             services.AddSingleton<IFrameService, FrameService>();
             services.AddSingleton(new PointReducer());
+            services.AddSingleton<IStatisticService,StatisticService>();
             HealthCheckEndPoint healthCheck = new HealthCheckEndPoint();
             Task.Run(() => { healthCheck.StartUp(healthCheckSettings); });
             // force start mongoconnection on start
