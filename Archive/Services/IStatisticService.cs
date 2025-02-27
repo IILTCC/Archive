@@ -6,5 +6,7 @@ namespace Archive.Services
     public interface IStatisticService
     {
         public Task<StatisticsRo> GetStatistics(GetStatisticDto getStatisticDto);
+        public Task<long> GetStatisticsCount(GetStatisticsCount getStatisticsCount);
+
     }
 }

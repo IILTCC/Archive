@@ -1,4 +1,4 @@
-﻿using Archive.Dtos;
+using Archive.Dtos;
 using DownSamplingLibary;
 using MongoConsumerLibary.MongoConnection;
 using MongoConsumerLibary.MongoConnection.Collections.PropetyClass;
@@ -21,9 +21,8 @@ namespace Archive.Services
         {
             getStatisticDto.StartDate = ConvertToUtc(getStatisticDto.StartDate);
             getStatisticDto.EndDate = ConvertToUtc(getStatisticDto.EndDate);
-            Console.WriteLine(getStatisticDto.StartDate);
-            Console.WriteLine(getStatisticDto.EndDate);
-            List<StatisticCollection> statisticsList = await _mongoConnection.GetStatisticDocument(0,0,getStatisticDto.StartDate, getStatisticDto.EndDate);
+            List<StatisticCollection> statisticsList = await _mongoConnection.GetStatisticDocument(getStatisticDto.StatisticsCount, getStatisticDto.StartPoint,getStatisticDto.StartDate, getStatisticDto.EndDate);
+
             StatisticsRo retDto = new StatisticsRo();
             retDto.Graphs = MapStatisticsGraph(statisticsList);
             (retDto.SevirityValues,retDto.Values) = MapStatisticsLastValues(statisticsList);
@@ -79,6 +78,14 @@ namespace Archive.Services
                 retValueDict.Add(parameterName, lastValue[parameterName].Value);
             }
             return (retSevirityDict, retValueDict);
+        }
+
+        public async Task<long> GetStatisticsCount(GetStatisticsCount getStatisticsCount)
+        {
+            getStatisticsCount.StartDate = ConvertToUtc(getStatisticsCount.StartDate);
+            getStatisticsCount.EndDate = ConvertToUtc(getStatisticsCount.EndDate);
+            return await _mongoConnection.GetStatisticsCount(getStatisticsCount.StartDate, getStatisticsCount.EndDate);
+
         }
     }
 }
