@@ -23,5 +23,10 @@ namespace Archive.Controllers
         {
             return _statisticService.GetStatistics(getStatisticDto);
         }
+        [HttpPost("getStatisticsCount")]
+        public Task<long> GetFrameCount([FromBody] GetStatisticsCount getStatisticsCount)
+        {
+            return _statisticService.GetStatisticsCount(getStatisticsCount);
+        }
     }
 }
