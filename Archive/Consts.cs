@@ -9,5 +9,6 @@
         public const string LOGGER_VARIABLE_NAME = "ProjectName";
         public const string PROJECT_NAME = "Archive";
         public const string LOGGER_IP = "127.0.0.1";
+        public static int MAX_POINTS = 50;
     }
 }

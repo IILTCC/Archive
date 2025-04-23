@@ -10,12 +10,12 @@ namespace Archive.Services
     {
         public PointReducer() { }
 
-        // fucntion to remove more points the bigger the input points non lineary
-        private double ReduceFunction(int pointCount)
+        private int ReduceFunction(int pointCount)
         {
-            return (Consts.UPPER_ASYMPTOTA_LIMIT / (1 + Consts.SLOPE / pointCount));
+            if (pointCount > Consts.MAX_POINTS)
+                return Consts.MAX_POINTS;
+            return pointCount;
         }
-        // x value is n point milisecond subtracted by first point miliseconds
         private List<PointHelper> ConvertToHelper(List<ParamValueDict> paramList)
         {
             List<PointHelper> retList = new List<PointHelper>();
@@ -40,8 +40,7 @@ namespace Archive.Services
             Dictionary<string, List<ParamValueDict>> retDict = new Dictionary<string, List<ParamValueDict>>();
             foreach(string dictKey in paramsDict.Keys)
             {
-                int desiredPoints = (int)(paramsDict[dictKey].Count * (Consts.PRECENT- ReduceFunction(paramsDict[dictKey].Count)) /Consts.PRECENT );
-                List<PointHelper> reducedList =  largestTriangle.ReducePoints(ConvertToHelper(paramsDict[dictKey]), desiredPoints);
+                List<PointHelper> reducedList =  largestTriangle.ReducePoints(ConvertToHelper(paramsDict[dictKey]), ReduceFunction(paramsDict[dictKey].Count));
                 retDict.Add(dictKey, ConvertToParam(reducedList, paramsDict[dictKey][0].PacketTime));
             }
             return retDict;
@@ -51,10 +50,8 @@ namespace Archive.Services
             LargestTriangle<GraphPoint> largestTriangle = new LargestTriangle<GraphPoint>();
             Dictionary<string, List<GraphPoint>> retDict = new Dictionary<string, List<GraphPoint>>();
             foreach(string dictKey in statisticsDict.Keys)
-            {
-                int desiredPoints = (int)(statisticsDict[dictKey].Count * (Consts.PRECENT - ReduceFunction(statisticsDict[dictKey].Count)) / Consts.PRECENT);
-                retDict.Add(dictKey, largestTriangle.ReducePoints(statisticsDict[dictKey],desiredPoints));
-            }
+                retDict.Add(dictKey, largestTriangle.ReducePoints(statisticsDict[dictKey],ReduceFunction(statisticsDict[dictKey].Count)));
+            
             return retDict;
         }
     }

@@ -1,4 +1,4 @@
-using Archive.Dtos;
+﻿using Archive.Dtos;
 using DownSamplingLibary;
 using MongoConsumerLibary.MongoConnection;
 using MongoConsumerLibary.MongoConnection.Collections.PropetyClass;
@@ -28,6 +28,18 @@ namespace Archive.Services
             (retDto.SevirityValues,retDto.Values) = MapStatisticsLastValues(statisticsList);
             return retDto;
         }
+        public async Task<StatisticsRo> GetFullStatistics(GetFullStatistics getFullStatistics)
+        {
+            getFullStatistics.StartDate = ConvertToUtc(getFullStatistics.StartDate);
+            getFullStatistics.EndDate = ConvertToUtc(getFullStatistics.EndDate);
+ 
+            List<StatisticCollection> statisticsList = await _mongoConnection.GetFullStatistics(getFullStatistics.StartDate, getFullStatistics.EndDate);
+
+            StatisticsRo retDto = new StatisticsRo();
+            retDto.Graphs = MapStatisticsGraph(statisticsList);
+            (retDto.SevirityValues, retDto.Values) = MapStatisticsLastValues(statisticsList);
+            return retDto;
+        }
         private DateTime ConvertToUtc(DateTime dateTime)
         {
             return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
@@ -43,6 +55,7 @@ namespace Archive.Services
             foreach(string dictKey in retDict.Keys)
                 for(int pointIndex = 0; pointIndex<retDict[dictKey].Count;pointIndex++)
                     retDict[dictKey][pointIndex].X = new DateTimeOffset(startingPointDict[dictKey].AddMilliseconds(retDict[dictKey][pointIndex].X)).ToUnixTimeMilliseconds();
+                 
 
             return retDict;
         }
@@ -57,9 +70,10 @@ namespace Archive.Services
                         retDict.Add(dictionaryKey, new List<GraphPoint>());
                         startingPointDict.Add(dictionaryKey, collection.RealTime);
                     }
-
+                    GraphPoint g = new GraphPoint(collection.RealTime.Subtract(startingPointDict[dictionaryKey]).TotalMilliseconds, collection.StatisticValues[dictionaryKey].Value);
+                    
                     // converting all points time to start from 0 relative to first point
-                    retDict[dictionaryKey].Add(new GraphPoint(startingPointDict[dictionaryKey].Subtract(collection.RealTime).TotalMilliseconds, collection.StatisticValues[dictionaryKey].Value));
+                    retDict[dictionaryKey].Add(new GraphPoint(collection.RealTime.Subtract(startingPointDict[dictionaryKey]).TotalMilliseconds, collection.StatisticValues[dictionaryKey].Value));
                 }
             }
         }
@@ -87,5 +101,12 @@ namespace Archive.Services
             return await _mongoConnection.GetStatisticsCount(getStatisticsCount.StartDate, getStatisticsCount.EndDate);
 
         }
+        public async Task<StatisticsDateRo> GetStatisticsDates()
+        {
+            (DateTime firstDate, DateTime endDate) = await _mongoConnection.GetStatisticsDocumentRange();
+            return new StatisticsDateRo(firstDate, endDate);
+        }
+
+
     }
 }
