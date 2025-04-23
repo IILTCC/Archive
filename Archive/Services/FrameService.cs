@@ -3,6 +3,7 @@ using Archive.Dtos.Incoming;
 using Archive.Logs;
 using MongoConsumerLibary.MongoConnection;
 using MongoConsumerLibary.MongoConnection.Collections;
+using MongoConsumerLibary.MongoConnection.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,20 @@ namespace Archive.Services
             getFrameCount.StartDate = ConvertToUtc(getFrameCount.StartDate);
             getFrameCount.EndDate = ConvertToUtc(getFrameCount.EndDate);
             return await _mongoConnection.GetDocumentCount(getFrameCount.StartDate, getFrameCount.EndDate, getFrameCount.CollectionType);
+        }
+
+        public async Task<FrameDatesRo> GetFrameDates(IcdType icdType)
+        {
+            (DateTime firstDate, DateTime endDate) = await _mongoConnection.GetFrameDocumentRange(icdType);
+            return new FrameDatesRo(firstDate, endDate);
+        }
+
+        public async Task<Dictionary<string, List<ParamValueDict>>> GetFullIcdFrames(GetFullIcdFramesDto getFullIcdFramesDto)
+        {
+            getFullIcdFramesDto.StartDate = ConvertToUtc(getFullIcdFramesDto.StartDate);
+            getFullIcdFramesDto.EndDate = ConvertToUtc(getFullIcdFramesDto.EndDate);
+            List<BaseBoxCollection> baseBoxList = await _mongoConnection.GetFullFrames(getFullIcdFramesDto.CollectionType, getFullIcdFramesDto.StartDate, getFullIcdFramesDto.EndDate);
+            return MapFramesToDictionary(getFullIcdFramesDto.StartDate, getFullIcdFramesDto.EndDate, baseBoxList);
         }
     }
 }
