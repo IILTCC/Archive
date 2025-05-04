@@ -82,7 +82,11 @@ namespace Archive.Services
         public async Task<FrameDatesRo> GetFrameDates(IcdType icdType)
         {
             (DateTime firstDate, DateTime endDate) = await _mongoConnection.GetFrameDocumentRange(icdType);
-            return new FrameDatesRo(firstDate, endDate);
+            DateTime originalStartUtc = firstDate;
+            DateTime unspecifiedStart = DateTime.SpecifyKind(originalStartUtc, DateTimeKind.Unspecified);
+            DateTime originalEndUtc = endDate;
+            DateTime unspecifiedEnd = DateTime.SpecifyKind(originalEndUtc, DateTimeKind.Unspecified);
+            return new FrameDatesRo(unspecifiedStart, unspecifiedEnd);
         }
 
         public async Task<Dictionary<string, List<ParamValueDict>>> GetFullIcdFrames(GetFullIcdFramesDto getFullIcdFramesDto)
