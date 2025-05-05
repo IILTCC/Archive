@@ -45,10 +45,10 @@ namespace Archive.Services
             }
             return retDict;
         }
-        public Dictionary<string, List<GraphPoint>> ReducePoint(Dictionary<string,List<GraphPoint>> statisticsDict)
+        public Dictionary<string, List<StatisticsPoint>> ReducePoint(Dictionary<string,List<StatisticsPoint>> statisticsDict)
         {
-            LargestTriangle<GraphPoint> largestTriangle = new LargestTriangle<GraphPoint>();
-            Dictionary<string, List<GraphPoint>> retDict = new Dictionary<string, List<GraphPoint>>();
+            LargestTriangle<StatisticsPoint> largestTriangle = new LargestTriangle<StatisticsPoint>();
+            Dictionary<string, List<StatisticsPoint>> retDict = new Dictionary<string, List<StatisticsPoint>>();
             foreach(string dictKey in statisticsDict.Keys)
                 retDict.Add(dictKey, largestTriangle.ReducePoints(statisticsDict[dictKey],ReduceFunction(statisticsDict[dictKey].Count)));
             
