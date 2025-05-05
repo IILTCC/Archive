@@ -25,7 +25,6 @@ namespace Archive.Services
 
             StatisticsRo retDto = new StatisticsRo();
             retDto.Graphs = MapStatisticsGraph(statisticsList);
-            //(retDto.SevirityValues,retDto.Values) = MapStatisticsLastValues(statisticsList);
             return retDto;
         }
         public async Task<StatisticsRo> GetFullStatistics(GetFullStatistics getFullStatistics)
@@ -37,7 +36,6 @@ namespace Archive.Services
 
             StatisticsRo retDto = new StatisticsRo();
             retDto.Graphs = MapStatisticsGraph(statisticsList);
-            //(retDto.SevirityValues, retDto.Values) = MapStatisticsLastValues(statisticsList);
             return retDto;
         }
         private DateTime ConvertToUtc(DateTime dateTime)
@@ -70,7 +68,6 @@ namespace Archive.Services
                         retDict.Add(dictionaryKey, new List<StatisticsPoint>());
                         startingPointDict.Add(dictionaryKey, collection.RealTime);
                     }
-                    //GraphPoint g = new GraphPoint(collection.RealTime.Subtract(startingPointDict[dictionaryKey]).TotalMilliseconds, collection.StatisticValues[dictionaryKey].Value, collection.StatisticValues[dictionaryKey].Sevirity);
                     
                     // converting all points time to start from 0 relative to first point
                     retDict[dictionaryKey].Add(new StatisticsPoint(collection.RealTime.Subtract(startingPointDict[dictionaryKey]).TotalMilliseconds, collection.StatisticValues[dictionaryKey].Value, collection.StatisticValues[dictionaryKey].Sevirity));
